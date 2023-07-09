@@ -2,4 +2,4 @@
 
 ## Member API
 
-[] It's a simple API using Flask.
+[ ] It's a simple API using Flask.

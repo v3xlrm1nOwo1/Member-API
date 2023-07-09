@@ -1,13 +1,19 @@
 import requests
 
+username = input('>>> Enter API username: ')
+password = input('>>> Enter API password: ')
+
+session = requests.session()
+session.auth = (username, password)
+
 def get_members():
     url = 'http://127.0.0.1:5000/member'
-    req = requests.get(url=url)
+    req = session.get(url=url)
     return req.json()
 
 def get_member(member_id):
     url = f'http://127.0.0.1:5000/member/{member_id}'
-    req = requests.get(url=url)
+    req = session.get(url=url)
     return req.json()
 
 def add_member(name, email, level):
@@ -17,7 +23,7 @@ def add_member(name, email, level):
         'email': email,
         'level': level
     }
-    req = requests.post(url=url, json=json)
+    req = session.post(url=url, json=json)
     return req.json()
 
 def edit_member(member_id, name, email, level, method):
@@ -29,10 +35,10 @@ def edit_member(member_id, name, email, level, method):
     }
     
     if method.lower() == 'put':
-        req = requests.put(url=url, json=json)
+        req = session.put(url=url, json=json)
         
     elif method.lower() == 'patch':
-        req = requests.patch(url=url, json=json)
+        req = session.patch(url=url, json=json)
     
     else:
         return 'Method Not Allowed.'
@@ -41,7 +47,7 @@ def edit_member(member_id, name, email, level, method):
 
 def delete_member(member_id):
     url = f'http://127.0.0.1:5000/member/{member_id}'
-    req = requests.delete(url=url)
+    req = session.delete(url=url)
     return req.json()
 
 
@@ -85,5 +91,5 @@ while True:
         break
         
     else:
-        print('Not Find Method.')
+        print('Not Find Method.\n\n',)
 

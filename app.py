@@ -1,13 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
 
 app = Flask(__name__)
 
+# Configrations
 app.config['DEBUG'] = True
+app.config['API_USERNAME'] = 'admin'
+app.config['API_PASSWORD'] = 'password'
+
 
 # Database configration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Members.db'
 db = SQLAlchemy(app)
+
 
 # Created Database
 class Members(db.Model):
@@ -20,8 +26,20 @@ class Members(db.Model):
 		return f'<name: {self.name}>'
 
 
+# Authentication
+def protected(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if auth and auth.username == app.config['API_USERNAME'] and auth.password == app.config['API_PASSWORD']:
+            return f(*args, **kwargs)
+        return jsonify({'Message': 'Authentication failed!'}), 403
+    return decorated
+
+
 # Get all Members
 @app.route('/member', methods=['GET'])
+@protected
 def get_members():
 	members = Members.query.order_by(Members.id).all()
 
@@ -35,6 +53,7 @@ def get_members():
 
 # Get Member by ID
 @app.route('/member/<int:member_id>', methods=['GET'])
+@protected
 def get_member(member_id):
 	member = Members.query.filter(Members.id==member_id).first()
 
@@ -46,6 +65,7 @@ def get_member(member_id):
 
 # Add new Member
 @app.route('/member', methods=['POST'])
+@protected
 def add_member():
 	if request.get_json():
 		new_member_data = request.get_json()
@@ -80,6 +100,7 @@ def add_member():
 
 # Update a Member by ID
 @app.route('/member/<int:member_id>', methods=['PUT', 'PATCH'])
+@protected
 def edit_member(member_id):
 	member = Members.query.filter(Members.id==member_id).first()
 	if member:
@@ -116,6 +137,7 @@ def edit_member(member_id):
 
 # Delete Member by ID 
 @app.route('/member/<int:member_id>', methods=['DELETE'])
+@protected
 def delete_member(member_id):
 	member = Members.query.filter(Members.id==member_id).first()
 	if member:

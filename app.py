@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Members.db'
 db = SQLAlchemy(app)
 
 
-# Created Database
+# Create Database
 class Members(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	name = db.Column(db.String(100), unique=True)
@@ -44,10 +44,8 @@ def get_members():
 	members = Members.query.order_by(Members.id).all()
 
 	members_list = []
-
 	for member in members:
 		members_list.append({f'{member.id} - Member': {'ID': member.id, 'Name': member.name, 'Email': member.email, 'Level': member.level}})
-
 	return jsonify({'Members': members_list})
 
 
